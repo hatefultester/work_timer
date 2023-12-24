@@ -1,13 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:work_timer/ios/pages/ios_home_page.dart';
-import 'package:work_timer/ios/widgets/components/ios_feature_component.dart';
-import 'package:work_timer/ios/widgets/transitions/ios_slide_transition_builder.dart';
+import 'package:work_timer/shared/ui_kit/ios/components/ios_feature_component.dart';
+import 'package:work_timer/shared/ui_kit/ios/ios_slide_transition_builder.dart';
 import 'package:work_timer/shared/service/storage.dart';
-import 'package:work_timer/shared/ui/animations.dart';
+import 'package:work_timer/shared/ui_kit/extensions/animations.dart';
 
 import '../../shared/config/keys.dart';
-import '../widgets/layouts/ios_new_features_layout.dart';
+import '../../shared/ui_kit/ios/layouts/ios_new_features_layout.dart';
 
 class IOSOnboardingPage extends StatelessWidget {
   const IOSOnboardingPage({super.key});

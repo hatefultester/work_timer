@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:work_timer/ios/pages/ios_onboarding_page.dart';
 import 'package:work_timer/shared/service/storage.dart';
@@ -14,8 +15,16 @@ class IOSApp extends StatelessWidget {
       init: IOSAppController(),
       builder: (controller) {
         return CupertinoApp(
+          localizationsDelegates: const [
+            DefaultCupertinoLocalizations.delegate,
+            DefaultMaterialLocalizations.delegate,
+          ],
           onGenerateTitle: (_) => 'Track your time',
-          theme: CupertinoThemeData(brightness: controller.brightness),
+          theme: CupertinoThemeData(
+            brightness: controller.brightness,
+            barBackgroundColor: CupertinoColors.systemBackground.resolveFrom(context),
+            primaryColor: controller.brightness == Brightness.dark ? CupertinoColors.white : CupertinoColors.black,
+          ),
           home: controller.hasSeenOnboardingAlready ? const IOSHomePage() : const IOSOnboardingPage(),
         );
       },
@@ -25,21 +34,30 @@ class IOSApp extends StatelessWidget {
 
 class IOSAppController extends GetxController {
   static IOSAppController get to => Get.find();
-  late final bool hasSeenOnboardingAlready;
+  late bool hasSeenOnboardingAlready;
   late Brightness brightness;
 
   @override
   void onInit() {
     super.onInit();
+    fetchDataFromStorage();
+  }
+
+  fetchDataFromStorage() {
     final brightnessIndex = storage.read<int?>(StorageKey.brightnessIndex);
     hasSeenOnboardingAlready = storage.read<bool?>(StorageKey.hasSeenOnboarding) ?? false;
     brightness = Brightness.values[brightnessIndex ?? 0];
   }
 
-  Future<void> toggleApplicationBrightness([_]) async {
+  toggleApplicationBrightness([_]) async {
     brightness = brightness == Brightness.light ? Brightness.dark : Brightness.light;
     storage.write(StorageKey.brightnessIndex, brightness.index);
     await storage.save();
+    update();
+  }
+
+  void restart() {
+    fetchDataFromStorage();
     update();
   }
 }

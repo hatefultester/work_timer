@@ -1,10 +1,10 @@
 import 'package:cupertino_onboarding/cupertino_onboarding.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
-import 'package:work_timer/shared/ui/context.dart';
-import 'package:work_timer/shared/ui/hero.dart';
+import 'package:work_timer/shared/ui_kit/extensions/context.dart';
+import 'package:work_timer/shared/ui_kit/extensions/hero.dart';
 
-import '../../../shared/ui/gap.dart';
+import '../../extensions/gap.dart';
 import '../components/ios_bottom_button_component.dart';
 
 class IOSNewFeaturesLayout extends StatelessWidget {
@@ -34,7 +34,7 @@ class IOSNewFeaturesLayout extends StatelessWidget {
         children: [
           Expanded(
             child: WhatsNewPage(
-              title:title.applyHero(titleHeroTag),
+              title: title.applyHero(titleHeroTag),
               featuresSeperator: Gap.v32,
               features: features,
             ),

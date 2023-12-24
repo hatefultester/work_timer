@@ -1,4 +1,6 @@
 abstract class StorageKey {
+
+
   static const brightnessIndex = 'brightness-index';
   static const hasSeenOnboarding = 'user-seen-onboarding';
   static const latestVersionStored = 'app-latest-version';

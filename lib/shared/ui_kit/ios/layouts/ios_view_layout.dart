@@ -9,26 +9,34 @@ class IOSViewLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CupertinoPageScaffold(
+    return SafeArea(
       child: Column(
         children: [
           header,
           Expanded(
             child: Container(
-              padding: EdgeInsets.symmetric(vertical: 16),
               width: double.infinity,
               height: double.infinity,
               decoration: BoxDecoration(
                 boxShadow: [
                   BoxShadow(
-                    color: CupertinoColors.systemFill.resolveFrom(context).withOpacity(0.15),
+                    color: CupertinoColors.systemGroupedBackground.resolveFrom(context).withOpacity(0.15),
                     blurRadius: 20,
                     spreadRadius: 10, // Use a negative spreadRadius
                     offset: Offset(0, -10),
                   ),
                 ],
-                color: CupertinoColors.systemGroupedBackground.resolveFrom(context),
-                borderRadius: BorderRadius.circular(16),
+                gradient: LinearGradient(
+                  colors: [
+                    CupertinoColors.systemIndigo.resolveFrom(context),
+                    CupertinoColors.systemIndigo.resolveFrom(context).withOpacity(0.85),
+                    CupertinoColors.systemGroupedBackground.resolveFrom(context),
+                    CupertinoColors.systemBackground.resolveFrom(context),
+                  ],
+                  stops: [0.2, 0.5, 0.85, 1],
+                  begin: Alignment.bottomCenter,
+                  end: Alignment.topCenter,
+                ),
               ),
               child: content,
             ),

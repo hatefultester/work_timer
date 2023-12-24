@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import '../../../shared/ui/context.dart';
+import '../../extensions/context.dart';
 
 class IOSBottomButtonComponent extends StatelessWidget {
   const IOSBottomButtonComponent({
@@ -26,8 +26,9 @@ class IOSBottomButtonComponent extends StatelessWidget {
               padding: const EdgeInsets.all(16),
               onPressed: () => callback(context),
               child: AnimatedDefaultTextStyle(
-                style: const TextStyle(
+                style: TextStyle(
                   fontWeight: FontWeight.w600,
+                  color: CupertinoTheme.of(context).primaryContrastingColor,
                   fontSize: 16,
                 ),
                 duration: kThemeChangeDuration,
