@@ -1,27 +1,31 @@
 import 'package:get/get.dart';
-import 'package:work_timer/shared/service/storage.dart';
+import 'package:work_timer/src/data/config/storage.dart';
 
-import '../model/task_model.dart';
-import '../model/work_day_model.dart';
+import '../models/task_model.dart';
+import '../models/work_day_model.dart';
 
 class TaskService extends GetxService {
   static TaskService get to => Get.find();
-  late Map<TaskFilterEnum, List<TaskModel>> tasksFromStorage;
-  late RxBool isSynced = false.obs;
 
+  late Map<TaskFilterEnum, List<TaskModel>>? _tasksFromStorage;
+
+  Map<TaskFilterEnum, List<TaskModel>> get tasksFromStorage => _tasksFromStorage ?? {};
+
+  late RxBool isSynced = false.obs;
 
   @override
   void onInit() async {
     super.onInit();
     _startSync();
-    tasksFromStorage = {};
+    _tasksFromStorage = {};
     final tasks = await TaskModelStorage.getAllTasksGrouped(storage);
-    tasksFromStorage = tasks;
+    _tasksFromStorage = tasks;
     _stopSync();
   }
 
   @override
   void onClose() {
+    _tasksFromStorage = null;
     isSynced.dispose();
     super.onClose();
   }

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:work_timer/shared/service/logger.dart';
-import 'package:work_timer/shared/service/storage.dart';
-import 'package:work_timer/shared/service/work_day_service.dart';
+import 'package:work_timer/src/data/config/logger.dart';
+import 'package:work_timer/src/data/config/storage.dart';
+import 'package:work_timer/src/data/services/work_day_service.dart';
 
-import 'ios/ios_app.dart';
-import 'shared/service/task_service.dart';
+import 'src/features/ios_app.dart';
+import 'src/data/services/task_service.dart';
 
 Future<void> main() async {
   await GetStorage.init();

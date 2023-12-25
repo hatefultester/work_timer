@@ -1,9 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:work_timer/ios/pages/ios_onboarding_page.dart';
-import 'package:work_timer/shared/service/storage.dart';
-import '../shared/config/keys.dart';
+import 'package:work_timer/src/features/pages/ios_onboarding_page.dart';
+import 'package:work_timer/src/data/config/storage.dart';
+import '../data/config/keys.dart';
 import 'pages/ios_home_page.dart';
 
 class IOSApp extends StatelessWidget {
@@ -34,8 +34,11 @@ class IOSApp extends StatelessWidget {
 
 class IOSAppController extends GetxController {
   static IOSAppController get to => Get.find();
-  late bool hasSeenOnboardingAlready;
-  late Brightness brightness;
+  late bool? _hasSeenOnboardingAlready;
+  late Brightness? _brightness;
+
+  bool get hasSeenOnboardingAlready => _hasSeenOnboardingAlready ?? false;
+  Brightness get brightness => _brightness ?? Brightness.values.first;
 
   @override
   void onInit() {
@@ -43,14 +46,21 @@ class IOSAppController extends GetxController {
     fetchDataFromStorage();
   }
 
-  fetchDataFromStorage() {
-    final brightnessIndex = storage.read<int?>(StorageKey.brightnessIndex);
-    hasSeenOnboardingAlready = storage.read<bool?>(StorageKey.hasSeenOnboarding) ?? false;
-    brightness = Brightness.values[brightnessIndex ?? 0];
+  @override
+  onClose() {
+    super.onClose();
+    _hasSeenOnboardingAlready = null;
+    _brightness = null;
   }
 
-  toggleApplicationBrightness([_]) async {
-    brightness = brightness == Brightness.light ? Brightness.dark : Brightness.light;
+  fetchDataFromStorage() {
+    final brightnessIndex = storage.read<int?>(StorageKey.brightnessIndex);
+    _hasSeenOnboardingAlready = storage.read<bool?>(StorageKey.hasSeenOnboarding) ?? false;
+    _brightness = Brightness.values[brightnessIndex ?? 0];
+  }
+
+  Future<void> toggleApplicationBrightness([_]) async {
+    _brightness = brightness == Brightness.light ? Brightness.dark : Brightness.light;
     storage.write(StorageKey.brightnessIndex, brightness.index);
     await storage.save();
     update();

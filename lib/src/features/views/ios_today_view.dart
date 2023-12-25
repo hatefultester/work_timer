@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
-import 'package:work_timer/shared/service/task_service.dart';
-import 'package:work_timer/shared/service/work_day_service.dart';
+import 'package:work_timer/src/data/services/task_service.dart';
+import 'package:work_timer/src/data/services/work_day_service.dart';
 
 class IOSTodayView extends StatelessWidget {
   const IOSTodayView({super.key});
@@ -24,18 +24,13 @@ class IOSTodayController extends GetxController {
 
   @override
   void onInit() {
+    syncWorker = everAll([TaskService.to.isSynced, WorkDayService.to.isSynced], _syncCallback);
+    _syncCallback();
     super.onInit();
   }
 
   @override
-  void onReady() {
-    syncWorker = everAll([TaskService.to.isSynced, WorkDayService.to.isSynced], _syncCallback);
-    _syncCallback();
-    super.onReady();
-  }
-
-  @override
-  void dispose() {
+  void onClose() {
     syncWorker.dispose();
     isSynced.dispose();
     super.dispose();
@@ -46,6 +41,7 @@ class IOSTodayController extends GetxController {
   }
 
   _syncCallback([_]) async {
+    if (TaskService.to.isSynced.isDisposed && WorkDayService.to.isSynced.isDisposed) syncWorker.dispose();
     isSynced.value = TaskService.to.isSynced.value && WorkDayService.to.isSynced.value;
   }
 }

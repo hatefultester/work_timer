@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import '../../extensions/context.dart';
+import '../shared/context.dart';
 
 class IOSBottomButtonComponent extends StatelessWidget {
   const IOSBottomButtonComponent({

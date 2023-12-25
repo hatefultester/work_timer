@@ -3,12 +3,18 @@ import 'dart:convert';
 import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:work_timer/shared/model/work_day_model.dart';
+import 'package:work_timer/src/data/models/work_day_model.dart';
 
 enum PriorityEnum {
   minor,
   major,
   critical;
+
+  String toStringFormatted() => switch (this) {
+        minor => 'Minor',
+        major => 'Major',
+        critical => 'Critical',
+      };
 
   String toJson() => switch (this) { minor => 'minor', major => 'major', critical => 'critical' };
 

@@ -1,8 +1,10 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:collection/collection.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
+import 'package:work_timer/src/ui_kit/shared/context.dart';
 
 OverlayEntry? overlayEntry;
 const Duration defaultOverlayDelayDuration = Duration(milliseconds: 100);
@@ -47,6 +49,7 @@ extension UIControllerExtension on GetxController {
   }) async {
     await showCupertinoDialog<bool?>(
       context: context,
+      barrierDismissible: true,
       builder: (context) => CupertinoAlertDialog(
         title: Text(title),
         content: Text(description),
@@ -80,6 +83,7 @@ extension UIControllerExtension on GetxController {
   }) async {
     await showCupertinoModalPopup<int?>(
         context: context,
+        barrierDismissible: true,
         builder: (context) {
           return SafeArea(
             child: CupertinoActionSheet(
@@ -101,5 +105,61 @@ extension UIControllerExtension on GetxController {
             ),
           );
         }).then((value) => onResultHandler.call(value, context));
+  }
+
+  showIOSTimerPicker(
+    BuildContext context, {
+    required Duration initialTimerDuration,
+    required void Function(Duration duration) onDurationChanged,
+    void Function(BuildContext context, Duration initialTimerDuration, bool wasConfirmed)? onClosed,
+  }) {
+    showCupertinoModalPopup<bool?>(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) => Container(
+        height: 216,
+        padding: const EdgeInsets.only(top: 6.0),
+        margin: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+        ),
+        color: CupertinoColors.systemBackground.resolveFrom(context),
+        child: SafeArea(
+          top: false,
+          child: Stack(
+            children: [
+              CupertinoTimerPicker(
+                mode: CupertinoTimerPickerMode.hm,
+                initialTimerDuration: initialTimerDuration,
+                onTimerDurationChanged: onDurationChanged,
+              ),
+              Align(
+                alignment: Alignment.topRight,
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 8.0),
+                  child: CupertinoButton(child: Text('Save'), onPressed: () => Navigator.of(context).pop(true),),
+                ),
+              )
+            ],
+          ),
+        ),
+      ),
+    ).then((result) => onClosed?.call(context, initialTimerDuration, result ?? false));
+  }
+
+  showIOSAlertDialog(
+    BuildContext context, {
+      required String title,
+    required String message,
+  }) {
+    showCupertinoDialog(
+        context: context,
+        barrierDismissible: true,
+        builder: (context) {
+          return CupertinoAlertDialog(
+            title: Text(title),
+            content: Text(message),
+            actions: [CupertinoDialogAction(child: Text('Ok'), onPressed: () => Navigator.pop(context),)],
+          );
+        });
   }
 }

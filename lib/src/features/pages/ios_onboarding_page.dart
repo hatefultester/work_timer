@@ -1,13 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
-import 'package:work_timer/ios/pages/ios_home_page.dart';
-import 'package:work_timer/shared/ui_kit/ios/components/ios_feature_component.dart';
-import 'package:work_timer/shared/ui_kit/ios/ios_slide_transition_builder.dart';
-import 'package:work_timer/shared/service/storage.dart';
-import 'package:work_timer/shared/ui_kit/extensions/animations.dart';
+import 'package:work_timer/src/features/pages/ios_home_page.dart';
+import 'package:work_timer/src/ui_kit/ios/ios_feature_component.dart';
+import 'package:work_timer/src/ui_kit/ios/ios_slide_transition_builder.dart';
+import 'package:work_timer/src/data/config/storage.dart';
+import 'package:work_timer/src/ui_kit/shared/animations.dart';
 
-import '../../shared/config/keys.dart';
-import '../../shared/ui_kit/ios/layouts/ios_new_features_layout.dart';
+import '../../data/config/keys.dart';
+import '../../ui_kit/ios/ios_new_features_layout.dart';
 
 class IOSOnboardingPage extends StatelessWidget {
   const IOSOnboardingPage({super.key});
@@ -38,7 +38,7 @@ class IOSOnboardingPage extends StatelessWidget {
         buttonLabel: const Text('Continue'),
         onButtonPressed: controller.onSubmitPressed,
       ).triggeredFadeOut(
-        controller.fadeOutAnimationTrigger,
+        controller.fadeOutAnimationTrigger ?? false,
         duration: 3.seconds,
       ),
     );
@@ -46,12 +46,18 @@ class IOSOnboardingPage extends StatelessWidget {
 }
 
 class IOSOnboardingController extends GetxController {
-  late bool fadeOutAnimationTrigger;
+  late bool? fadeOutAnimationTrigger;
 
   @override
   onInit() {
     super.onInit();
     fadeOutAnimationTrigger = false;
+  }
+
+  @override
+  onClose() {
+    super.onClose();
+    fadeOutAnimationTrigger = null;
   }
 
   onSubmitPressed(BuildContext context) async {

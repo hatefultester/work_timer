@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 
 class IOSViewLayout extends StatelessWidget {
   const IOSViewLayout({super.key, required this.header, required this.content});
@@ -23,7 +22,7 @@ class IOSViewLayout extends StatelessWidget {
                     color: CupertinoColors.systemGroupedBackground.resolveFrom(context).withOpacity(0.15),
                     blurRadius: 20,
                     spreadRadius: 10, // Use a negative spreadRadius
-                    offset: Offset(0, -10),
+                    offset: const Offset(0, -10),
                   ),
                 ],
                 gradient: LinearGradient(
@@ -33,7 +32,7 @@ class IOSViewLayout extends StatelessWidget {
                     CupertinoColors.systemGroupedBackground.resolveFrom(context),
                     CupertinoColors.systemBackground.resolveFrom(context),
                   ],
-                  stops: [0.2, 0.5, 0.85, 1],
+                  stops: const [0.2, 0.5, 0.85, 1],
                   begin: Alignment.bottomCenter,
                   end: Alignment.topCenter,
                 ),

@@ -1,11 +1,11 @@
 import 'package:cupertino_onboarding/cupertino_onboarding.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
-import 'package:work_timer/shared/ui_kit/extensions/context.dart';
-import 'package:work_timer/shared/ui_kit/extensions/hero.dart';
+import 'package:work_timer/src/ui_kit/shared/context.dart';
+import 'package:work_timer/src/ui_kit/shared/hero.dart';
 
-import '../../extensions/gap.dart';
-import '../components/ios_bottom_button_component.dart';
+import '../shared/gap.dart';
+import 'ios_bottom_button_component.dart';
 
 class IOSNewFeaturesLayout extends StatelessWidget {
   const IOSNewFeaturesLayout({

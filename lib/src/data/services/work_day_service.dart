@@ -1,24 +1,27 @@
 import 'package:get/get.dart';
-import 'package:work_timer/shared/model/work_day_model.dart';
-import 'package:work_timer/shared/service/storage.dart';
+import 'package:work_timer/src/data/models/work_day_model.dart';
+import 'package:work_timer/src/data/config/storage.dart';
 
 class WorkDayService extends GetxService {
   static WorkDayService get to => Get.find();
-  late List<WorkDayModel> workDaysFromStorage;
+  late List<WorkDayModel>? _workDaysFromStorage;
+
+  List<WorkDayModel> get workDaysFromStorage => _workDaysFromStorage ?? [];
   late RxBool isSynced = false.obs;
 
   @override
   void onInit() async {
     super.onInit();
     _startSync();
-    workDaysFromStorage = [];
+    _workDaysFromStorage = [];
     final workDays = await WorkDayModelStorage.getWorkDaysFromStorage(storage);
-    workDaysFromStorage = workDays;
+    _workDaysFromStorage = workDays;
     _stopSync();
   }
 
   @override
   void onClose() {
+    _workDaysFromStorage = null;
     isSynced.dispose();
     super.onClose();
   }
@@ -38,7 +41,7 @@ class WorkDayService extends GetxService {
 
   Future<void> updateWorkDay(WorkDayModel model) async {
     _startSync();
-    workDaysFromStorage = {model, ...workDaysFromStorage}.toList();
+    _workDaysFromStorage = {model, ...workDaysFromStorage}.toList();
     await workDaysFromStorage.storeWorkDaysToStorage(storage);
     _stopSync();
   }
