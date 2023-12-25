@@ -6,6 +6,10 @@ initStorage([GetStorage? storage]) {
   Get.lazyPut<GetStorage>(() => instance, permanent: true);
 }
 
-extension StorageExtension on GetxController {
+extension StorageControllerExtension on GetxController {
+  GetStorage get storage => Get.find<GetStorage>();
+}
+
+extension StorageServiceExtension on GetxService {
   GetStorage get storage => Get.find<GetStorage>();
 }
