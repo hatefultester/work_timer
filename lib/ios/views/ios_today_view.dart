@@ -6,7 +6,11 @@ class IOSTodayView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return GetBuilder<IOSTodayController>(
+        init: IOSTodayController(),
+        builder: (controller) {
+
+        });
   }
 }
 
