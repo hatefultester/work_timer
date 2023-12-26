@@ -62,7 +62,7 @@ class IOSHomePageController extends GetxController {
     await showIOSModalPopUp(context, actions: const [
       IOSActionData(label: 'Help'),
       IOSActionData(label: 'Report issue', isDestructive: true),
-      IOSActionData(label: 'About up', isDefault: true),
+      IOSActionData(label: 'About us', isDefault: true),
     ], onResultHandler: (indexSelected, context) async {
       if (indexSelected == null) return;
     });

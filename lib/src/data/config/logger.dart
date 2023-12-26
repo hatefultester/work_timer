@@ -9,3 +9,7 @@ initLogger([Logger? logger]) {
 extension LoggerExtension on GetxController {
   Logger get logger => Get.find();
 }
+
+extension LoggerServiceExtension on GetxService {
+  Logger get logger => Get.find();
+}

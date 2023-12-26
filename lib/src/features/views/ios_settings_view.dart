@@ -1,13 +1,18 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:work_timer/src/data/config/keys.dart';
+import 'package:work_timer/src/data/models/work_day_model.dart';
+import 'package:work_timer/src/data/services/task_service.dart';
+import 'package:work_timer/src/data/services/work_day_service.dart';
 import 'package:work_timer/src/features/ios_app.dart';
 import 'package:work_timer/src/features/pages/ios_onboarding_page.dart';
 import 'package:work_timer/src/data/config/storage.dart';
+import 'package:work_timer/src/ui_kit/shared/app_icon_component.dart';
 import 'package:work_timer/src/ui_kit/shared/controller.dart';
 
 import '../../data/models/task_model.dart';
 import '../../ui_kit/ios/ios_section_component.dart';
+import '../../ui_kit/shared/gap.dart';
 
 class IOSSettingsView extends StatelessWidget {
   const IOSSettingsView({super.key});
@@ -41,7 +46,7 @@ class IOSSettingsView extends StatelessWidget {
                 informationParser: controller.workingIntervalParser,
                 iconData: CupertinoIcons.archivebox,
               ),
-              IOSSectionItem<Rx<PriorityEnum>>.popUp(
+              IOSSectionItem<Rx<TaskPriorityEnum>>.popUp(
                 label: 'Default task priority',
                 onTap: controller.openChangePriorityPopUp,
                 informationObserver: controller.defaultTaskPriority,
@@ -49,7 +54,11 @@ class IOSSettingsView extends StatelessWidget {
                 iconData: CupertinoIcons.archivebox,
               ),
             ],
-          )
+          ),
+          Gap.v64,
+          const AppIconComponent(
+            appVersionNumber: AppConstants.latestAppVersion,
+          ),
         ],
       ),
     );
@@ -57,25 +66,25 @@ class IOSSettingsView extends StatelessWidget {
 }
 
 class IOSSettingsController extends GetxController {
-  late RxBool isDarkThemeActive;
-  late Rx<Duration> defaultWorkingInterval;
-  late Rx<PriorityEnum> defaultTaskPriority;
-  late Rx<Duration> _internalWorkingInterval;
+  late final RxBool isDarkThemeActive;
+  late final Rx<Duration> defaultWorkingInterval;
+  late final Rx<TaskPriorityEnum> defaultTaskPriority;
+  late final Rx<Duration> _internalWorkingInterval;
   Worker? _internalWorkingIntervalWorker;
   bool _ignoreDebouncer = true;
 
   @override
   onInit() {
     super.onInit();
-    defaultWorkingInterval = const Duration(hours: 8).obs;
-    _internalWorkingInterval = const Duration(hours: 8).obs;
+    defaultWorkingInterval = WorkDayService.to.defaultWorkingHoursDuration.obs;
+    _internalWorkingInterval = WorkDayService.to.defaultWorkingHoursDuration.obs;
 
     _internalWorkingIntervalWorker = debounce(_internalWorkingInterval, (callback) {
       if (_ignoreDebouncer) return;
       defaultWorkingInterval.value = callback;
     }, time: 50.milliseconds);
 
-    defaultTaskPriority = PriorityEnum.major.obs;
+    defaultTaskPriority = TaskService.to.defaultTaskPriority.obs;
     isDarkThemeActive = (IOSAppController.to.brightness == Brightness.values.first).obs;
   }
 
@@ -111,7 +120,8 @@ class IOSSettingsController extends GetxController {
         }
         await storage.erase();
         await hideIOSLoadingOverlay();
-
+        TaskService.to.onInit();
+        WorkDayService.to.onInit();
         IOSAppController.to.restart();
         navigator.pushReplacement(CupertinoPageRoute(builder: (_) => const IOSOnboardingPage()));
       },
@@ -129,17 +139,20 @@ class IOSSettingsController extends GetxController {
   void openChangePriorityPopUp(BuildContext context) {
     showIOSModalPopUp(context,
         cancelText: 'Dismiss',
-        actions: PriorityEnum.values
+        actions: TaskPriorityEnum.values
             .map(
               (e) => IOSActionData(
                 label: e.toStringFormatted(),
                 isDestructive: e == defaultTaskPriority.value,
               ),
             )
-            .toList(), onResultHandler: (result, context) {
+            .toList(), onResultHandler: (result, context) async {
       if (result == null) return;
-      final parsedFromIndex = PriorityEnum.values[result];
+      showIOSLoadingOverlay(context);
+      final parsedFromIndex = TaskPriorityEnum.values[result];
       defaultTaskPriority.value = parsedFromIndex;
+      await TaskService.to.setDefaultTaskPriority(parsedFromIndex);
+      await hideIOSLoadingOverlay();
     });
   }
 
@@ -167,15 +180,17 @@ class IOSSettingsController extends GetxController {
       _ignoreDebouncer = true;
     }
     final selectedInterval = defaultWorkingInterval.value;
-    final isLessThenMinimal = selectedInterval < const Duration(hours: 2);
-    final isMoreThenMaximal = selectedInterval > const Duration(hours: 12);
+    final isLessThenMinimal = selectedInterval < WorkDayModel.minimalDayDuration;
+    final isMoreThenMaximal = selectedInterval > WorkDayModel.maximalDayDuration;
     if (!isLessThenMinimal && !isMoreThenMaximal && wasConfirmed) {
-      // TODO: handle storing
+      showIOSLoadingOverlay(context);
+      await WorkDayService.to.storeNewDefaultWorkingHours(defaultWorkingInterval.value);
+      await hideIOSLoadingOverlay();
       return;
     }
     defaultWorkingInterval.value = initialTimerDuration;
     if (!wasConfirmed) return;
     showIOSAlertDialog(context,
-        message: 'Working interval must be between 2 - 12 hours', title: 'Selected interval was not allowed');
+        message: 'Working interval must be between 2 - 14 hours', title: 'Selected interval was not allowed');
   }
 }

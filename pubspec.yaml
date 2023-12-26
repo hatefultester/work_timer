@@ -28,3 +28,28 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+  assets:
+    - assets/images/
+
+  fonts:
+    - family: SFCompactRounded
+      fonts:
+        - asset: assets/fonts/SF-Compact-Rounded-Black.otf
+          weight: 900
+        - asset: assets/fonts/SF-Compact-Rounded-Bold.otf
+          weight: 700
+        - asset: assets/fonts/SF-Compact-Rounded-Heavy.otf
+          weight: 800
+        - asset: assets/fonts/SF-Compact-Rounded-Light.otf
+          weight: 300
+        - asset: assets/fonts/SF-Compact-Rounded-Medium.otf
+          weight: 500
+        - asset: assets/fonts/SF-Compact-Rounded-Regular.otf
+          weight: 400
+        - asset: assets/fonts/SF-Compact-Rounded-Semibold.otf
+          weight: 600
+        - asset: assets/fonts/SF-Compact-Rounded-Thin.otf
+          weight: 100
+        - asset: assets/fonts/SF-Compact-Rounded-Ultralight.otf
+          weight: 200

@@ -17,25 +17,7 @@ class IOSViewLayout extends StatelessWidget {
               width: double.infinity,
               height: double.infinity,
               decoration: BoxDecoration(
-                boxShadow: [
-                  BoxShadow(
-                    color: CupertinoColors.systemGroupedBackground.resolveFrom(context).withOpacity(0.15),
-                    blurRadius: 20,
-                    spreadRadius: 10, // Use a negative spreadRadius
-                    offset: const Offset(0, -10),
-                  ),
-                ],
-                gradient: LinearGradient(
-                  colors: [
-                    CupertinoColors.systemIndigo.resolveFrom(context),
-                    CupertinoColors.systemIndigo.resolveFrom(context).withOpacity(0.85),
-                    CupertinoColors.systemGroupedBackground.resolveFrom(context),
-                    CupertinoColors.systemBackground.resolveFrom(context),
-                  ],
-                  stops: const [0.2, 0.5, 0.85, 1],
-                  begin: Alignment.bottomCenter,
-                  end: Alignment.topCenter,
-                ),
+                color: CupertinoColors.systemBlue.resolveFrom(context).withOpacity(0.3),
               ),
               child: content,
             ),

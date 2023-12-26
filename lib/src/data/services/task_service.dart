@@ -11,6 +11,10 @@ class TaskService extends GetxService {
 
   Map<TaskFilterEnum, List<TaskModel>> get tasksFromStorage => _tasksFromStorage ?? {};
 
+  late TaskPriorityEnum? _defaultPriority;
+
+  TaskPriorityEnum get defaultTaskPriority => _defaultPriority ?? TaskPriorityEnum.major;
+
   late RxBool isSynced = false.obs;
 
   @override
@@ -20,11 +24,15 @@ class TaskService extends GetxService {
     _tasksFromStorage = {};
     final tasks = await TaskModelStorage.getAllTasksGrouped(storage);
     _tasksFromStorage = tasks;
+
+    final defaultPriorityJson = storage.read<String?>('task-priority-default');
+    _defaultPriority = TaskPriorityEnum.fromJson(defaultPriorityJson);
     _stopSync();
   }
 
   @override
   void onClose() {
+    _defaultPriority = null;
     _tasksFromStorage = null;
     isSynced.dispose();
     super.onClose();
@@ -75,5 +83,13 @@ class TaskService extends GetxService {
     tasksFromStorage[filter] = tasksFromStorage[filter]!..remove(taskModel);
     await tasksFromStorage.updateGroupInStorage(MapEntry(filter, tasksFromStorage[filter]!), storage);
     _stopSync();
+  }
+
+  Future<void> setDefaultTaskPriority(TaskPriorityEnum defaultPriority) async {
+    if (defaultTaskPriority == _defaultPriority) return;
+    _defaultPriority = defaultPriority;
+    final json = defaultTaskPriority.toJson();
+    await storage.write('task-priority-default', json);
+    await storage.save();
   }
 }

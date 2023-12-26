@@ -21,6 +21,12 @@ class IOSApp extends StatelessWidget {
           ],
           onGenerateTitle: (_) => 'Track your time',
           theme: CupertinoThemeData(
+            textTheme: CupertinoTextThemeData(
+              textStyle: TextStyle(
+                fontFamily: 'SFCompactRounded',
+                color: CupertinoColors.label.resolveFrom(context),
+              ),
+            ),
             brightness: controller.brightness,
             barBackgroundColor: CupertinoColors.systemBackground.resolveFrom(context),
             primaryColor: controller.brightness == Brightness.dark ? CupertinoColors.white : CupertinoColors.black,
@@ -38,6 +44,7 @@ class IOSAppController extends GetxController {
   late Brightness? _brightness;
 
   bool get hasSeenOnboardingAlready => _hasSeenOnboardingAlready ?? false;
+
   Brightness get brightness => _brightness ?? Brightness.values.first;
 
   @override

@@ -5,7 +5,7 @@ import 'package:equatable/equatable.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:work_timer/src/data/models/work_day_model.dart';
 
-enum PriorityEnum {
+enum TaskPriorityEnum {
   minor,
   major,
   critical;
@@ -18,7 +18,7 @@ enum PriorityEnum {
 
   String toJson() => switch (this) { minor => 'minor', major => 'major', critical => 'critical' };
 
-  static PriorityEnum fromJson(dynamic json) => switch (json) {
+  static TaskPriorityEnum fromJson(dynamic json) => switch (json) {
         'minor' => minor,
         'major' => major,
         'critical' => critical,
@@ -34,8 +34,8 @@ enum TaskFilterEnum {
 
   static TaskFilterEnum fromTaskModel(TaskModel model) {
     if (model.isCompleted) return completedTasks;
-    if (model.priority == PriorityEnum.minor) return uncompletedMinorTasks;
-    if (model.priority == PriorityEnum.major) return uncompletedMajorTasks;
+    if (model.priority == TaskPriorityEnum.minor) return uncompletedMinorTasks;
+    if (model.priority == TaskPriorityEnum.major) return uncompletedMajorTasks;
     return uncompletedCriticalTasks;
   }
 
@@ -61,7 +61,7 @@ class TaskModel extends Equatable {
   factory TaskModel.newTask({
     required String name,
     required String description,
-    required PriorityEnum priority,
+    required TaskPriorityEnum priority,
     String? workDayId,
   }) {
     final index = random.nextInt(100);
@@ -90,7 +90,7 @@ class TaskModel extends Equatable {
       name: name,
       description: description,
       isCompleted: isCompleted,
-      priority: PriorityEnum.fromJson(priority),
+      priority: TaskPriorityEnum.fromJson(priority),
       startDate: DateTime.parse(startDate),
       id: id,
       workDayId: workDayId,
@@ -127,7 +127,7 @@ class TaskModel extends Equatable {
         workDayId: workDayId,
       );
 
-  TaskModel changePriority(PriorityEnum priority) => TaskModel._internal(
+  TaskModel changePriority(TaskPriorityEnum priority) => TaskModel._internal(
         id: id,
         name: name,
         description: description,
@@ -162,7 +162,7 @@ class TaskModel extends Equatable {
   final String name;
   final String description;
   final bool isCompleted;
-  final PriorityEnum priority;
+  final TaskPriorityEnum priority;
   final DateTime startDate;
 
   @override
@@ -177,7 +177,7 @@ extension TaskFilter on List<TaskModel> {
   Map<TaskFilterEnum, List<TaskModel>> get groupByFilter => groupBy(this, TaskFilterEnum.fromTaskModel);
 
   static List<TaskModel> fromJson(dynamic json) => switch (json) {
-        List<Map<String, dynamic>> jsonMap => jsonMap.map((e) => TaskModel.fromJson(e)).toList(),
+        List<dynamic> jsonMap => jsonMap.map((e) => TaskModel.fromJson(e)).toList(),
         _ => [],
       };
 

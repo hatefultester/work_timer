@@ -13,7 +13,8 @@ class IOSHeaderComponent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
+    return Container(
+      color:  CupertinoColors.systemBlue.resolveFrom(context).withOpacity(0.3),
       height: 80,
       child: Row(
         children: [
@@ -25,13 +26,6 @@ class IOSHeaderComponent extends StatelessWidget {
               color: CupertinoColors.label.resolveFrom(context),
               fontWeight: FontWeight.w400,
               letterSpacing: 1.5,
-              shadows: [
-                Shadow(
-                  color: CupertinoColors.label.resolveFrom(context).withOpacity(0.15),
-                  blurRadius: 10,
-                  offset: const Offset(5, 5),
-                ),
-              ],
               fontSize: 30,
             ),
           ),
