@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../data/services/device_service.dart';
 import 'gap.dart';
 
 OverlayEntry? overlayEntry;
@@ -172,16 +173,54 @@ extension UIControllerExtension on GetxController {
         });
   }
 
-  showIOSColorCustomizationBottomSheet(
+  showIOSCreationBottomSheet<T>(
     BuildContext context, {
-    required List<IOSColorCustomizationBottomSheetOption> options,
-    required FutureOr<void> Function(List<IOSColorCustomizationBottomSheetOption>) onChanged,
-    required FutureOr<void> Function(BuildContext, List<IOSColorCustomizationBottomSheetOption>, bool) onClosed,
-  }) {
-    showModalBottomSheet(
+    required Widget view,
+    required T initialValue,
+    required FutureOr<void> Function(BuildContext, T initial, T? saved) onClosed,
+  }) async {
+    final maxHeight = DeviceService.to.deviceHeight(context) * 0.8;
+
+    showModalBottomSheet<T>(
       context: context,
+      useRootNavigator: true,
+      isScrollControlled: true,
+      builder: (context) => DecoratedBox(decoration: BoxDecoration(
+        color: CupertinoColors.secondarySystemGroupedBackground.resolveFrom(context),
+      ),
+        child: Padding(
+          padding: EdgeInsets.only(
+            top: 8,
+            bottom: MediaQuery.of(context).viewInsets.bottom + 8,
+          ),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return ConstrainedBox(
+
+                constraints: BoxConstraints(maxHeight: maxHeight),
+                child: SingleChildScrollView(child: view),
+              );
+            },
+          ),
+        ),
+      ),
+    ).then(
+      (value) {
+        onClosed.call(context, initialValue, value);
+      },
+    );
+  }
+
+  showIOSColorCustomizationBottomSheet(
+    BuildContext ancestorContext, {
+    required List<IOSColorCustomizationBottomSheetOption> options,
+    required FutureOr<void> Function(List<IOSColorCustomizationBottomSheetOption>, BuildContext) onChanged,
+    required FutureOr<void> Function(BuildContext, List<IOSColorCustomizationBottomSheetOption>, bool) onClosed,
+  }) async {
+    showModalBottomSheet<bool?>(
+      context: ancestorContext,
       builder: (context) => GetBuilder<ShowIOSColorCustomizationBottomSheetController>(
-        init: ShowIOSColorCustomizationBottomSheetController(options, onChanged, onClosed),
+        init: ShowIOSColorCustomizationBottomSheetController(options, onChanged, context),
         builder: (controller) => Container(
           height: 400,
           width: double.infinity,
@@ -319,7 +358,9 @@ extension UIControllerExtension on GetxController {
           ),
         ),
       ),
-    );
+    ).then((value) {
+      onClosed.call(ancestorContext, options, value ?? false);
+    });
   }
 }
 
@@ -364,14 +405,23 @@ class ShowIOSColorCustomizationBottomSheetController extends GetxController {
   late final List<IOSColorCustomizationRxRGBModel> models;
   late int selectedIndex = 0;
 
-  final FutureOr<void> Function(List<IOSColorCustomizationBottomSheetOption>) onChanged;
-  final FutureOr<void> Function(BuildContext, List<IOSColorCustomizationBottomSheetOption>, bool) onClosed;
+  final FutureOr<void> Function(List<IOSColorCustomizationBottomSheetOption>, BuildContext) onChanged;
 
   late Worker updateWorker;
   late Worker updateNotifierDebouncer;
   late final Rxn<List<IOSColorCustomizationBottomSheetOption>> updateOptions;
 
-  ShowIOSColorCustomizationBottomSheetController(this.options, this.onChanged, this.onClosed) {
+  final BuildContext dialogContext;
+
+  @override
+  onClose() {
+    updateWorker.dispose();
+    updateNotifierDebouncer.dispose();
+    updateOptions.dispose();
+    super.onClose();
+  }
+
+  ShowIOSColorCustomizationBottomSheetController(this.options, this.onChanged, this.dialogContext) {
     models = options.map((e) => IOSColorCustomizationRxRGBModel.fromColor(e.value)).toList();
     updateOptions = Rxn();
     updateWorker = everAll(models.expand((e) => [e.r, e.o, e.b, e.g]).toList(), (callback) {
@@ -387,7 +437,7 @@ class ShowIOSColorCustomizationBottomSheetController extends GetxController {
     });
     updateNotifierDebouncer = debounce(updateOptions, (callback) {
       if (callback == null) return;
-      onChanged(callback);
+      onChanged(callback, dialogContext);
     });
   }
 
@@ -414,10 +464,6 @@ class ShowIOSColorCustomizationBottomSheetController extends GetxController {
 
   saveToggled(BuildContext context) async {
     final navigator = Navigator.of(context);
-    showIOSLoadingOverlay(context);
-    await hideIOSLoadingOverlay();
-    updateWorker.dispose();
-    updateNotifierDebouncer.dispose();
     navigator.pop(true);
   }
 }
@@ -430,5 +476,10 @@ extension Colorextension on Color {
       255 - green,
       255 - blue,
     );
+  }
+
+  Color toBlackOrWhite() {
+    int luminance = (0.3 * red + 0.59 * green + 0.11 * blue).round();
+    return (luminance > 128) ? Color.fromARGB(alpha, 255, 255, 255) : Color.fromARGB(alpha, 0, 0, 0);
   }
 }

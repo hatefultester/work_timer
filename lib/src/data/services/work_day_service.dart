@@ -1,13 +1,16 @@
 import 'package:get/get.dart';
 import 'package:work_timer/src/data/config/logger.dart';
+import 'package:work_timer/src/data/extension/work_day_model_extension.dart';
 import 'package:work_timer/src/data/models/work_day_model.dart';
 import 'package:work_timer/src/data/config/storage.dart';
 
 class WorkDayService extends GetxService {
   static WorkDayService get to => Get.find();
+
   late List<WorkDayModel>? _workDaysFromStorage;
 
   List<WorkDayModel> get workDaysFromStorage => _workDaysFromStorage ?? [];
+
   late RxBool isSynced = false.obs;
 
   late int? _defaultWorkingHoursInSeconds;
@@ -27,8 +30,6 @@ class WorkDayService extends GetxService {
     final workDays = await WorkDayModelStorage.getWorkDaysFromStorage(storage);
     _workDaysFromStorage = workDays;
 
-    logger.i(_workDaysFromStorage.toString());
-
     _stopSync();
   }
 
@@ -42,7 +43,7 @@ class WorkDayService extends GetxService {
 
   WorkDayModel get todayWorkDay {
     final today = DateTime.now().toYMD();
-    return workDaysFromStorage.firstWhere((element) => element.workDate.toYMD().isAtSameMomentAs(today));
+    return workDaysFromStorage.firstWhere((e) => e.workDate.toYMD().isAtSameMomentAs(today));
   }
 
   void _startSync() {

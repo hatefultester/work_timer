@@ -1,7 +1,11 @@
+import 'package:collection/collection.dart';
 import 'package:get/get.dart';
+import 'package:work_timer/src/data/config/logger.dart';
 import 'package:work_timer/src/data/config/storage.dart';
+import 'package:work_timer/src/data/extension/task_model_extensions.dart';
 
 import '../models/task_model.dart';
+import '../models/task_priority_enum.dart';
 import '../models/work_day_model.dart';
 
 class TaskService extends GetxService {
@@ -22,8 +26,10 @@ class TaskService extends GetxService {
     super.onInit();
     _startSync();
     _tasksFromStorage = {};
-    final tasks = await TaskModelStorage.getAllTasksGrouped(storage);
+    final tasks = await TaskModelStorageExtension.getAllTasksGrouped(storage);
     _tasksFromStorage = tasks;
+
+    logger.i('TaskService: tasksFromStorage: $_tasksFromStorage');
 
     final defaultPriorityJson = storage.read<String?>('task-priority-default');
     _defaultPriority = TaskPriorityEnum.fromJson(defaultPriorityJson);
@@ -57,7 +63,8 @@ class TaskService extends GetxService {
     taskList.addAll(completedTasks.where((element) => element.workDayId == model.id));
     taskList.addAll(uncompletedTasks
         .where((element) => element.workDayId == model.id || element.startDate.isBefore(model.workDate)));
-    await TaskModelStorage.updateTasks(taskList, storage);
+    await TaskModelStorageExtension.updateTasks(taskList, storage);
+    logger.d('TaskService: getTaskForWorkDay: $taskList');
     return taskList;
   }
 
@@ -71,6 +78,7 @@ class TaskService extends GetxService {
 
   Future<void> updateTask(TaskModel taskModel) async {
     _startSync();
+    deleteTaskById(taskModel.id, internal: true);
     final TaskFilterEnum filter = TaskFilterEnum.fromTaskModel(taskModel);
     tasksFromStorage[filter] = {taskModel, ...tasksFromStorage[filter]!}.toList();
     await tasksFromStorage.updateGroupInStorage(MapEntry(filter, tasksFromStorage[filter]!), storage);
@@ -83,6 +91,21 @@ class TaskService extends GetxService {
     tasksFromStorage[filter] = tasksFromStorage[filter]!..remove(taskModel);
     await tasksFromStorage.updateGroupInStorage(MapEntry(filter, tasksFromStorage[filter]!), storage);
     _stopSync();
+  }
+
+  Future<void> deleteTaskById(String taskId, {bool internal = false}) async {
+    if (!internal) {
+      _startSync();
+    }
+    final TaskModel? taskModel =
+        tasksFromStorage.values.expand((element) => element).firstWhereOrNull((element) => element.id == taskId);
+    if (taskModel == null) return;
+    final TaskFilterEnum filter = TaskFilterEnum.fromTaskModel(taskModel);
+    tasksFromStorage[filter] = tasksFromStorage[filter]!..remove(taskModel);
+    if (!internal) {
+      await tasksFromStorage.updateGroupInStorage(MapEntry(filter, tasksFromStorage[filter]!), storage);
+      _stopSync();
+    }
   }
 
   Future<void> setDefaultTaskPriority(TaskPriorityEnum defaultPriority) async {

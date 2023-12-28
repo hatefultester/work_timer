@@ -10,7 +10,7 @@ import 'package:work_timer/src/data/config/storage.dart';
 import 'package:work_timer/src/ui_kit/shared/app_icon_component.dart';
 import 'package:work_timer/src/ui_kit/shared/controller.dart';
 
-import '../../data/models/task_model.dart';
+import '../../data/models/task_priority_enum.dart';
 import '../../ui_kit/ios/ios_section_component.dart';
 import '../../ui_kit/shared/gap.dart';
 
@@ -190,7 +190,10 @@ class IOSSettingsController extends GetxController {
     }
     defaultWorkingInterval.value = initialTimerDuration;
     if (!wasConfirmed) return;
-    showIOSAlertDialog(context,
-        message: 'Working interval must be between 2 - 14 hours', title: 'Selected interval was not allowed');
+    showIOSAlertDialog(
+      context,
+      message: 'Working interval must be between 2 - 14 hours',
+      title: 'Selected interval was not allowed',
+    );
   }
 }

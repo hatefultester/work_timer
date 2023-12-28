@@ -5,6 +5,7 @@ import 'package:work_timer/src/data/config/logger.dart';
 import 'package:work_timer/src/data/config/storage.dart';
 import 'package:work_timer/src/data/services/work_day_service.dart';
 
+import 'src/data/services/device_service.dart';
 import 'src/features/ios_app.dart';
 import 'src/data/services/task_service.dart';
 
@@ -17,6 +18,7 @@ Future<void> main() async {
 }
 
 initServices() {
-  Get.put<TaskService>(TaskService(), permanent: true);
-  Get.put<WorkDayService>(WorkDayService(), permanent: true);
+  Get.lazyPut<DeviceService>(DeviceService.new, permanent: true);
+  Get.lazyPut<TaskService>(TaskService.new, permanent: true);
+  Get.lazyPut<WorkDayService>(WorkDayService.new, permanent: true);
 }
